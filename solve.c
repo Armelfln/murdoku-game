@@ -1,11 +1,13 @@
 #include "board.h"
 #include "solve.h"
 #include<stdlib.h>
+#include<stdio.h>
 
 int solver(struct Box ** board, struct Perso * tab_perso, struct Clue ** tab_clue, int id_perso, int limite){
 
-    if( id_perso == NUMBER_OF_CHARACTERS) // tous les perso ont ete place avec succes
+    if( id_perso == NUMBER_OF_CHARACTERS){
         return 1 ;
+    }
 
     int total = 0 ;
 
@@ -23,10 +25,9 @@ int solver(struct Box ** board, struct Perso * tab_perso, struct Clue ** tab_clu
                 unplace_a_character(tab_perso, id_perso, board) ;
 
                 if(total >= limite)
-                    return total ; // arret anticipe, pas la peine d'explorer plus
+                    return total ;
             }
         }
     }
     return total ;
-
 }

@@ -1,6 +1,7 @@
 #include "clue.h"
 #include "board.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 int create_a_clue(struct Box ** tab_general, struct Perso * perso, struct Clue ** tab_clue){ // tab_clue doit etre de taille 2*NUMBER_OF_CHARACTERS
     struct Clue * a_clue = malloc(sizeof(struct Clue)) ;
@@ -10,7 +11,8 @@ int create_a_clue(struct Box ** tab_general, struct Perso * perso, struct Clue *
     int obj, dir ;
     do {
         obj = rand()%6 ;
-        dir = rand()%9 ;
+        dir = rand()%8 ;
+        if(dir >= 4) dir++ ; // saute la valeur 4 (Center)
         a_clue->obj_id = (Object_id) obj ;
         a_clue->position_id = (Position_id) dir ;
         k++ ;
@@ -48,15 +50,18 @@ int all_clue_good(struct Box ** board, struct Perso * tab, struct Clue ** tab_cl
     int all_ok = 0 ;
 
     while(!all_ok && p < 10){
-        all_ok = 1 ; // on suppose que tout est bon, et on se detrompe si besoin
+        all_ok = 1 ;
 
         for(int i = 0 ; i < 2*NUMBER_OF_CHARACTERS ; i++){
             if(tab_clue[i] != NULL && !is_the_clue_respected(board, tab, tab_clue[i])){
-                all_ok = 0 ; // au moins un indice invalide trouve
+                all_ok = 0 ;
 
                 int id_perso_concerne = tab_clue[i]->id_perso ;
+
+                erase_the_clue_object(board, tab, tab_clue[i]) ; // efface l'ancien objet AVANT de liberer le clue
+
                 free(tab_clue[i]) ;
-                tab_clue[i] = NULL ; // a re-remplir par create_a_clue
+                tab_clue[i] = NULL ;
 
                 int q = 0 ;
                 while(create_a_clue(board, &tab[id_perso_concerne], tab_clue) == 0 && q < 10){
@@ -71,3 +76,4 @@ int all_clue_good(struct Box ** board, struct Perso * tab, struct Clue ** tab_cl
         return 0 ;
     return 1 ;
 }
+

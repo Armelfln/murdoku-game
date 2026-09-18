@@ -44,6 +44,11 @@ typedef enum {
 
 struct Box;
 
+struct Pos{
+    int pos_x ;
+    int pos_y ;
+};
+
 struct Perso{
     int id_perso ;
     int pos_x ; // c'est le num de la case sur le plateau de 9x9
@@ -85,8 +90,14 @@ void general_tab_free(struct Box ** board);
 /*Choisit un personnage au hasard comme victime*/
 struct Perso choose_a_victim(struct Perso * tab_perso);
 
-/*Retourne un pointeur vers la victime dans le tableau de personnages*/
-struct Perso * find_victim(struct Perso * tab_perso);
+/*Choisi un personnage au hasard qui n'est pas la victime comme meurtrier*/
+struct Perso choose_a_murderer(struct Perso * tab_perso);
+
+/*Retourne le rang de la victime dans le tableau de personnages*/
+int find_victim(struct Perso * tab_perso);
+
+/*Retourne le rang du meurtrier dans le tableau de personnages*/
+int find_murderer(struct Perso * tab_perso);
 
 /*Retourne la position x d'un personnage*/
 int pos_x_perso(struct Perso * tab_perso, int id_perso);
@@ -120,5 +131,10 @@ int place_an_object_oriented(struct Box ** tab_general, Object_id obj_id, int po
 
 /*Verifie si un indice est respecte par les positions actuelles des personnages*/
 int is_the_clue_respected(struct Box ** tab_general, struct Perso * tab, struct Clue * a_clue);
+
+/*retourne un tableau de coordonné de toutes les case de la meme room que la victime*/
+struct Pos * the_room_of_the_victim(struct Box ** tab_general, struct Perso * tab_perso);
+
+void erase_the_clue_object(struct Box ** tab_general, struct Perso * tab, struct Clue * a_clue);
 
 #endif

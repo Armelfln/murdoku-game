@@ -2,6 +2,7 @@
 #include "clue.h"
 #include <stdlib.h>
 #include <time.h>
+#include <stdio.h>
 
 struct Box{
     Object_id obj_id ;
@@ -117,12 +118,29 @@ struct Perso choose_a_victim(struct Perso * tab_perso){
     return tab_perso[victim_id] ;
 }
 
-struct Perso * find_victim(struct Perso * tab_perso){
+struct Perso choose_a_murderer(struct Perso * tab_perso){
+    int murderer_id = rand()%NUMBER_OF_CHARACTERS ;
+    while( tab_perso[murderer_id].suspect != 1){
+        murderer_id = rand()%NUMBER_OF_CHARACTERS ;
+    }
+    tab_perso[murderer_id].suspect = 2 ; // 2 c'est pour le meurtrier
+    return tab_perso[murderer_id] ;
+}
+
+int find_victim(struct Perso * tab_perso){
     for(int i = 0 ; i < NUMBER_OF_CHARACTERS ; i++){
         if(tab_perso[i].suspect == 0)
-            return &tab_perso[i] ;
+            return i ;
     }
-    return NULL ;
+    return -1;
+}
+
+int find_murderer(struct Perso * tab_perso){
+    for(int i = 0 ; i < NUMBER_OF_CHARACTERS ; i++){
+        if(tab_perso[i].suspect == 2)
+            return i ;
+    }
+    return -1;
 }
 
 int pos_x_perso(struct Perso * tab_perso, int id_perso){
@@ -175,92 +193,92 @@ int place_an_object_oriented(struct Box ** tab_general, Object_id obj_id, int po
     if(pos_id == North_West){
         int k = pos_x -1;
         int p = pos_y -1;
-        while(k >= 0 && p >= 0 && tab_general[k][p].obj_id != Empty){ // bornes verifiees avant l'acces
+        while(k >= 0 && p >= 0 && (tab_general[k][p].obj_id != Empty || tab_general[k][p].perso != NULL)){
             k-- ;
             p-- ;
         }
         if(k < 0 || p < 0)
-            return 0 ; // on a pas pu placer l'objet
+            return 0 ;
         tab_general[k][p].obj_id = obj_id ;
         return 1 ;
     }
     if(pos_id == North){
         int k = pos_x -1;
         int p = pos_y ;
-        while(k >= 0 && tab_general[k][p].obj_id != Empty){
+        while(k >= 0 && (tab_general[k][p].obj_id != Empty || tab_general[k][p].perso != NULL)){
             k-- ;
         }
         if(k < 0)
-            return 0 ; // on a pas pu placer l'objet
+            return 0 ;
         tab_general[k][p].obj_id = obj_id ;
         return 1 ;
     }
     if(pos_id == North_East){
         int k = pos_x +1 ;
         int p = pos_y -1 ;
-        while(k < BOARD_SIZE && p >= 0 && tab_general[k][p].obj_id != Empty){
+        while(k < BOARD_SIZE && p >= 0 && (tab_general[k][p].obj_id != Empty || tab_general[k][p].perso != NULL)){
             k++ ;
             p-- ;
         }
         if(k == BOARD_SIZE || p < 0)
-            return 0 ; // on a pas pu placer l'objet
+            return 0 ;
         tab_general[k][p].obj_id = obj_id ;
         return 1 ;
     }
     if(pos_id == West){
         int k = pos_x ;
         int p = pos_y -1 ;
-        while(p >= 0 && tab_general[k][p].obj_id != Empty){
+        while(p >= 0 && (tab_general[k][p].obj_id != Empty || tab_general[k][p].perso != NULL)){
             p-- ;
         }
         if(p < 0)
-            return 0 ; // on a pas pu placer l'objet
+            return 0 ;
         tab_general[k][p].obj_id = obj_id ;
         return 1 ;
     }
     if(pos_id == East){
         int k = pos_x +1 ;
         int p = pos_y ;
-        while(k < BOARD_SIZE && tab_general[k][p].obj_id != Empty){
+        while(k < BOARD_SIZE && (tab_general[k][p].obj_id != Empty || tab_general[k][p].perso != NULL)){
             k++ ;
         }
         if(k == BOARD_SIZE)
-            return 0 ; // on a pas pu placer l'objet
+            return 0 ;
         tab_general[k][p].obj_id = obj_id ;
         return 1 ;
     }
     if(pos_id == South_West){
         int k = pos_x -1 ;
         int p = pos_y +1 ;
-        while(k >= 0 && p < BOARD_SIZE && tab_general[k][p].obj_id != Empty){
+        while(k >= 0 && p < BOARD_SIZE && (tab_general[k][p].obj_id != Empty || tab_general[k][p].perso != NULL)){
             k-- ;
             p++ ;
         }
         if(k < 0 || p == BOARD_SIZE)
-            return 0 ; // on a pas pu placer l'objet
+            return 0 ;
         tab_general[k][p].obj_id = obj_id ;
         return 1 ;
     }
     if(pos_id == South){
         int k = pos_x +1;
         int p = pos_y ;
-        while(k < BOARD_SIZE && tab_general[k][p].obj_id != Empty){
+        while(k < BOARD_SIZE && (tab_general[k][p].obj_id != Empty || tab_general[k][p].perso != NULL)){
             k++ ;
         }
         if(k == BOARD_SIZE)
-            return 0 ; // on a pas pu placer l'objet
+            return 0 ;
         tab_general[k][p].obj_id = obj_id ;
         return 1 ;
     }
     if(pos_id == South_East){
         int k = pos_x +1;
         int p = pos_y +1;
-        while(k < BOARD_SIZE && p < BOARD_SIZE && tab_general[k][p].obj_id != Empty){
+        while(k < BOARD_SIZE && p < BOARD_SIZE && (tab_general[k][p].obj_id != Empty || tab_general[k][p].perso != NULL)){
             k++ ;
             p++ ;
         }
         if(k == BOARD_SIZE || p == BOARD_SIZE)
-            return 0 ; // on a pas pu placer l'objet
+            return 0 ;
         tab_general[k][p].obj_id = obj_id ;
         return 1 ;
     }
@@ -369,4 +387,128 @@ int is_the_clue_respected(struct Box ** tab_general, struct Perso * tab, struct 
         return tab_general[k][p].obj_id == a_clue->obj_id ;
     }
     return 0 ;
+}
+
+// Room_id find_which_room(struct Box ** tab_general, int pos_x, int pos_y){
+//     return tab_general[pos_x][pos_y].room_id ;
+// }
+
+struct Pos * the_room_of_the_victim(struct Box ** tab_general, struct Perso * tab_perso){
+    int i = find_victim(tab_perso) ;
+    Room_id room_id = find_which_room(tab_general, tab_perso[i].pos_x, tab_perso[i].pos_y) ;
+
+    struct Pos * pos = malloc(9 * sizeof(struct Pos)) ;
+    int k = 0 ;
+    for(int p = 0 ; p < BOARD_SIZE ; p++){
+        for(int q = 0 ; q < BOARD_SIZE ; q++){
+            if(tab_general[p][q].room_id == room_id){
+                pos[k].pos_x = p ;
+                pos[k].pos_y = q ;
+                k++ ;
+            }
+        }
+    }
+    return pos ;
+}
+void erase_the_clue_object(struct Box ** tab_general, struct Perso * tab, struct Clue * a_clue){
+
+    int pos_x = tab[a_clue->id_perso].pos_x ;
+    int pos_y = tab[a_clue->id_perso].pos_y ;
+
+    if(a_clue->position_id == Center){
+        tab_general[pos_x][pos_y].obj_id = Empty ;
+        return ;
+    }
+    if(a_clue->position_id == North_West){
+        int k = pos_x -1;
+        int p = pos_y -1;
+        while(k >= 0 && p >= 0 && tab_general[k][p].obj_id == Empty){
+            k-- ;
+            p-- ;
+        }
+        if(k < 0 || p < 0)
+            return ; // rien trouve, rien a effacer
+        tab_general[k][p].obj_id = Empty ;
+        return ;
+    }
+    if(a_clue->position_id == North){
+        int k = pos_x -1;
+        int p = pos_y ;
+        while(k >= 0 && tab_general[k][p].obj_id == Empty){
+            k-- ;
+        }
+        if(k < 0)
+            return ;
+        tab_general[k][p].obj_id = Empty ;
+        return ;
+    }
+    if(a_clue->position_id == North_East){
+        int k = pos_x +1 ;
+        int p = pos_y -1 ;
+        while(k < BOARD_SIZE && p >= 0 && tab_general[k][p].obj_id == Empty){
+            k++ ;
+            p-- ;
+        }
+        if(k == BOARD_SIZE || p < 0)
+            return ;
+        tab_general[k][p].obj_id = Empty ;
+        return ;
+    }
+    if(a_clue->position_id == West){
+        int k = pos_x ;
+        int p = pos_y -1 ;
+        while(p >= 0 && tab_general[k][p].obj_id == Empty){
+            p-- ;
+        }
+        if(p < 0)
+            return ;
+        tab_general[k][p].obj_id = Empty ;
+        return ;
+    }
+    if(a_clue->position_id == East){
+        int k = pos_x +1 ;
+        int p = pos_y ;
+        while(k < BOARD_SIZE && tab_general[k][p].obj_id == Empty){
+            k++ ;
+        }
+        if(k == BOARD_SIZE)
+            return ;
+        tab_general[k][p].obj_id = Empty ;
+        return ;
+    }
+    if(a_clue->position_id == South_West){
+        int k = pos_x -1 ;
+        int p = pos_y +1 ;
+        while(k >= 0 && p < BOARD_SIZE && tab_general[k][p].obj_id == Empty){
+            k-- ;
+            p++ ;
+        }
+        if(k < 0 || p == BOARD_SIZE)
+            return ;
+        tab_general[k][p].obj_id = Empty ;
+        return ;
+    }
+    if(a_clue->position_id == South){
+        int k = pos_x +1;
+        int p = pos_y ;
+        while(k < BOARD_SIZE && tab_general[k][p].obj_id == Empty){
+            k++ ;
+        }
+        if(k == BOARD_SIZE)
+            return ;
+        tab_general[k][p].obj_id = Empty ;
+        return ;
+    }
+    if(a_clue->position_id == South_East){
+        int k = pos_x +1;
+        int p = pos_y +1;
+        while(k < BOARD_SIZE && p < BOARD_SIZE && tab_general[k][p].obj_id == Empty){
+            k++ ;
+            p++ ;
+        }
+        if(k == BOARD_SIZE || p == BOARD_SIZE)
+            return ;
+        tab_general[k][p].obj_id = Empty ;
+        return ;
+    }
 }

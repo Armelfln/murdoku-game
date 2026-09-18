@@ -24,4 +24,6 @@ void clue_free(struct Clue ** tab);
 /*Verifie que tous les indices sur le plateau sont valide et les regenere sinon*/
 int all_clue_good(struct Box ** board, struct Perso * tab, struct Clue ** tab_clue);
 
+
+
 #endif
