@@ -5,8 +5,9 @@
 #include "board.h"
 #include "clue.h"
 #include "solve.h"
+#include "display.h"
 
-int generate_puzzle(void){
+int generate_puzzle(struct Box *** out_board, struct Perso ** out_tab_perso, struct Clue *** out_tab_clue){
     struct Box ** board = general_tab() ;
     struct Perso * tab_perso = initialize_tab_perso() ;
     choose_a_victim(tab_perso) ;
@@ -46,6 +47,12 @@ int generate_puzzle(void){
         }
     }
 
+    if(room_has_extra_suspect(board, tab_perso)){
+        general_tab_free(board) ;
+        tab_perso_free(tab_perso) ;
+        return 1 ;
+    }
+
     struct Clue ** tab_clue = initialize_tab_clue() ;
     for(int i = 0 ; i < NUMBER_OF_CHARACTERS ; i++){
         create_a_clue(board, &tab_perso[i], tab_clue) ;
@@ -60,18 +67,35 @@ int generate_puzzle(void){
         return 1 ;
     }
 
+    // sauvegarde des positions de la solution avant de les retirer pour le solveur
+    int ref_pos_x[NUMBER_OF_CHARACTERS] ;
+    int ref_pos_y[NUMBER_OF_CHARACTERS] ;
+    for(int i = 0 ; i < NUMBER_OF_CHARACTERS ; i++){
+        ref_pos_x[i] = tab_perso[i].pos_x ;
+        ref_pos_y[i] = tab_perso[i].pos_y ;
+    }
+
     for(int i = 0 ; i < NUMBER_OF_CHARACTERS ; i++){
         unplace_a_character(tab_perso, i, board) ;
     }
 
     int nb_solutions = solver(board, tab_perso, tab_clue, 0, 2) ;
 
-    general_tab_free(board) ;
-    tab_perso_free(tab_perso) ;
-    clue_free(tab_clue) ;
-
-    if(nb_solutions != 1)
+    if(nb_solutions != 1){
+        general_tab_free(board) ;
+        tab_perso_free(tab_perso) ;
+        clue_free(tab_clue) ;
         return 1 ;
+    }
+
+    // on replace les persos a leur position d'origine (la solution) pour la conserver
+    for(int i = 0 ; i < NUMBER_OF_CHARACTERS ; i++){
+        place_a_character(ref_pos_x[i], ref_pos_y[i], tab_perso, i, board) ;
+    }
+
+    *out_board = board ;
+    *out_tab_perso = tab_perso ;
+    *out_tab_clue = tab_clue ;
 
     return 0 ;
 }
@@ -79,10 +103,18 @@ int generate_puzzle(void){
 int main(void){
     srand(time(NULL)) ;
 
+    struct Box ** board = NULL ;
+    struct Box ** copy = NULL ;
+    struct Perso * tab_perso = NULL ;
+    struct Perso * tab_perso_jeu = initialize_tab_perso() ;
+    struct Clue ** tab_clue = NULL ;
+
     int result = 1 ;
     int attempts = 0 ;
+
     while(result != 0 && attempts < 1000){
-        result = generate_puzzle() ;
+        result = generate_puzzle(&board, &tab_perso, &tab_clue) ;
+        copy = copy_board(board) ;
         attempts++ ;
     }
 
@@ -92,5 +124,21 @@ int main(void){
     }
 
     printf("puzzle genere avec succes apres %d tentative(s)\n", attempts) ;
+
+
+    for(int i = 0 ; i < NUMBER_OF_CHARACTERS ; i++){
+    printf("Perso %d : (%d, %d)\n", i, tab_perso[i].pos_x, tab_perso[i].pos_y) ;
+    }
+    show_solution(board,copy,tab_perso, tab_perso_jeu, tab_clue) ;
+
+    // ici, board / tab_perso / tab_clue contiennent le puzzle final complet,
+    // prets a etre utilises (affichage, raylib, etc.)
+
+    general_tab_free(board) ;
+    general_tab_free(copy) ;
+    tab_perso_free(tab_perso) ;
+    tab_perso_free(tab_perso_jeu) ;
+    clue_free(tab_clue) ;
+
     return 0 ;
 }

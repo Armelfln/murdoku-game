@@ -121,7 +121,7 @@ Position_id find_which_position(struct Box ** tab_general, int pos_x, int pos_y)
 Object_id find_what_object(struct Box ** tab_general, int pos_x, int pos_y);
 
 /*Retourne le personnage present sur une case, NULL si aucun*/
-struct Perso * who_perso(struct Box ** tab_general, int pos_x, int pos_y);
+int who_perso(struct Box ** tab_general, struct Perso * tab_perso, int pos_x, int pos_y);
 
 /*Indique si une room est vide de tout personnage*/
 int is_a_room_empty(struct Box ** tab_general, int pos_x, int pos_y);
@@ -136,5 +136,9 @@ int is_the_clue_respected(struct Box ** tab_general, struct Perso * tab, struct 
 struct Pos * the_room_of_the_victim(struct Box ** tab_general, struct Perso * tab_perso);
 
 void erase_the_clue_object(struct Box ** tab_general, struct Perso * tab, struct Clue * a_clue);
+
+int room_has_extra_suspect(struct Box ** board, struct Perso * tab_perso);
+
+struct Box ** copy_board(struct Box ** board);
 
 #endif

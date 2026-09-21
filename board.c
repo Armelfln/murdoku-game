@@ -171,8 +171,16 @@ Object_id find_what_object(struct Box ** tab_general, int pos_x, int pos_y){
     return tab_general[pos_x][pos_y].obj_id ;
 }
 
-struct Perso * who_perso(struct Box ** tab_general, int pos_x, int pos_y){
-    return tab_general[pos_x][pos_y].perso ;
+int who_perso(struct Box ** tab_general, struct Perso * tab_perso, int pos_x, int pos_y){
+    int i = 0 ;
+    if(tab_general[pos_x][pos_y].perso == NULL)
+        return -1 ;
+    while(tab_general[pos_x][pos_y].perso != &tab_perso[i] && i < NUMBER_OF_CHARACTERS){
+        i++ ;
+    }
+    if(i == NUMBER_OF_CHARACTERS)
+        return -1 ;
+    return i ;
 }
 //fonction a utiliser pour placer les suspect
 int is_a_room_empty(struct Box ** tab_general, int pos_x, int pos_y){ // fonction a verifier claude
@@ -511,4 +519,61 @@ void erase_the_clue_object(struct Box ** tab_general, struct Perso * tab, struct
         tab_general[k][p].obj_id = Empty ;
         return ;
     }
+}
+
+struct Perso * show_murderer(struct Box ** board){
+    Room_id room_id = Kitchen ;
+    for(int i = 0 ; i < BOARD_SIZE ; i++){
+        for(int j = 0 ; j < BOARD_SIZE ; j++){
+            if(board[i][j].perso != NULL && board[i][j].perso->suspect == 0)
+                room_id = board[i][j].room_id ;
+        }
+    }
+    for(int i = 0 ; i < BOARD_SIZE ; i++){
+        for(int j = 0 ; j < BOARD_SIZE ; j++){
+            if(board[i][j].perso != NULL && board[i][j].perso->suspect != 0 && board[i][j].room_id == room_id){
+                return board[i][j].perso ;
+            }
+        }
+    }
+    return NULL ;
+}
+
+int id_murderer(struct Box ** board, struct Perso * tab_perso){
+    struct Perso * p = show_murderer(board) ;
+    for(int i = 0 ; i < NUMBER_OF_CHARACTERS ; i++){
+        if(&tab_perso[i] == p)
+            return i ;
+    }
+    return -1 ;
+}
+
+int room_has_extra_suspect(struct Box ** board, struct Perso * tab_perso){
+    int victim_id = find_victim(tab_perso) ;
+    Room_id victim_room = find_which_room(board, tab_perso[victim_id].pos_x, tab_perso[victim_id].pos_y) ;
+
+    for(int i = 0 ; i < NUMBER_OF_CHARACTERS ; i++){
+        if(tab_perso[i].suspect == 1){ // un suspect "normal", ni victime ni meurtrier
+            Room_id r = find_which_room(board, tab_perso[i].pos_x, tab_perso[i].pos_y) ;
+            if(r == victim_room)
+                return 1 ; // un suspect en trop se trouve dans la room de la victime
+        }
+    }
+    return 0 ; // aucun suspect en trop
+}
+
+struct Box ** copy_board(struct Box ** board){
+    struct Box ** copy = malloc(BOARD_SIZE * sizeof(struct Box *)) ;
+    for(int i = 0 ; i < BOARD_SIZE ; i++){
+        copy[i] = malloc(BOARD_SIZE * sizeof(struct Box)) ;
+    }
+    for(int i = 0 ; i < BOARD_SIZE ; i++){
+        for (int j = 0 ; j < BOARD_SIZE ; j++){
+            copy[i][j].obj_id = board[i][j].obj_id ;
+            copy[i][j].room_id = board[i][j].room_id ;
+            copy[i][j].position_id = board[i][j].position_id ;
+            copy[i][j].perso = NULL ;
+        }
+    }
+    return copy ;
 }
