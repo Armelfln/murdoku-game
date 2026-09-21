@@ -114,7 +114,6 @@ int main(void){
 
     while(result != 0 && attempts < 1000){
         result = generate_puzzle(&board, &tab_perso, &tab_clue) ;
-        copy = copy_board(board) ;
         attempts++ ;
     }
 
@@ -122,6 +121,7 @@ int main(void){
         printf("echec : impossible de generer un puzzle valide apres %d tentatives\n", attempts) ;
         return 1 ;
     }
+    copy = copy_board(board) ;
 
     printf("puzzle genere avec succes apres %d tentative(s)\n", attempts) ;
 
