@@ -577,3 +577,4 @@ struct Box ** copy_board(struct Box ** board){
     }
     return copy ;
 }
+

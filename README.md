@@ -1,2 +1,14 @@
-# murdoku-game
-A try to create a murdoku which is a game like a sudoku but with enigma 
+# Murdoku
+
+## Installation
+
+### macOS
+brew install raylib
+
+### Linux (Debian/Ubuntu)
+sudo apt install libraylib-dev
+
+## Compilation et lancement
+
+make
+./murdoku
