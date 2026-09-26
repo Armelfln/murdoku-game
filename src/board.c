@@ -222,13 +222,13 @@ int place_an_object_oriented(struct Box ** tab_general, Object_id obj_id, int po
         return 1 ;
     }
     if(pos_id == North_East){
-        int k = pos_x +1 ;
-        int p = pos_y -1 ;
-        while(k < BOARD_SIZE && p >= 0 && (tab_general[k][p].obj_id != Empty || tab_general[k][p].perso != NULL)){
-            k++ ;
-            p-- ;
+        int k = pos_x -1 ;
+        int p = pos_y +1 ;
+        while(k >= 0 && p < BOARD_SIZE && (tab_general[k][p].obj_id != Empty || tab_general[k][p].perso != NULL)){
+            k-- ;
+            p++ ;
         }
-        if(k == BOARD_SIZE || p < 0)
+        if(k < 0 || p == BOARD_SIZE)
             return 0 ;
         tab_general[k][p].obj_id = obj_id ;
         return 1 ;
@@ -256,13 +256,13 @@ int place_an_object_oriented(struct Box ** tab_general, Object_id obj_id, int po
         return 1 ;
     }
     if(pos_id == South_West){
-        int k = pos_x -1 ;
-        int p = pos_y +1 ;
-        while(k >= 0 && p < BOARD_SIZE && (tab_general[k][p].obj_id != Empty || tab_general[k][p].perso != NULL)){
-            k-- ;
-            p++ ;
+        int k = pos_x +1 ;
+        int p = pos_y -1 ;
+        while(k < BOARD_SIZE && p >= 0 && (tab_general[k][p].obj_id != Empty || tab_general[k][p].perso != NULL)){
+            k++ ;
+            p-- ;
         }
-        if(k < 0 || p == BOARD_SIZE)
+        if(k == BOARD_SIZE || p < 0)
             return 0 ;
         tab_general[k][p].obj_id = obj_id ;
         return 1 ;
@@ -332,13 +332,13 @@ int is_the_clue_respected(struct Box ** tab_general, struct Perso * tab, struct 
         return tab_general[k][p].obj_id == a_clue->obj_id ;
     }
     if(a_clue->position_id == North_East){
-        int k = pos_x +1 ;
-        int p = pos_y -1 ;
-        while(k < BOARD_SIZE && p >= 0 && tab_general[k][p].obj_id == Empty){
-            k++ ;
-            p-- ;
+        int k = pos_x -1 ;
+        int p = pos_y +1 ;
+        while(k >= 0 && p < BOARD_SIZE && tab_general[k][p].obj_id == Empty){
+            k-- ;
+            p++ ;
         }
-        if(k == BOARD_SIZE || p < 0)
+        if(k < 0 || p == BOARD_SIZE)
             return 0 ;
         return tab_general[k][p].obj_id == a_clue->obj_id ;
     }
@@ -363,13 +363,13 @@ int is_the_clue_respected(struct Box ** tab_general, struct Perso * tab, struct 
         return tab_general[k][p].obj_id == a_clue->obj_id ;
     }
     if(a_clue->position_id == South_West){
-        int k = pos_x -1 ;
-        int p = pos_y +1 ;
-        while(k >= 0 && p < BOARD_SIZE && tab_general[k][p].obj_id == Empty){
-            k-- ;
-            p++ ;
+        int k = pos_x +1 ;
+        int p = pos_y -1 ;
+        while(k < BOARD_SIZE && p >= 0 && tab_general[k][p].obj_id == Empty){
+            k++ ;
+            p-- ;
         }
-        if(k < 0 || p == BOARD_SIZE)
+        if(k == BOARD_SIZE || p < 0)
             return 0 ;
         return tab_general[k][p].obj_id == a_clue->obj_id ;
     }
@@ -396,10 +396,6 @@ int is_the_clue_respected(struct Box ** tab_general, struct Perso * tab, struct 
     }
     return 0 ;
 }
-
-// Room_id find_which_room(struct Box ** tab_general, int pos_x, int pos_y){
-//     return tab_general[pos_x][pos_y].room_id ;
-// }
 
 struct Pos * the_room_of_the_victim(struct Box ** tab_general, struct Perso * tab_perso){
     int i = find_victim(tab_perso) ;
@@ -451,13 +447,13 @@ void erase_the_clue_object(struct Box ** tab_general, struct Perso * tab, struct
         return ;
     }
     if(a_clue->position_id == North_East){
-        int k = pos_x +1 ;
-        int p = pos_y -1 ;
-        while(k < BOARD_SIZE && p >= 0 && tab_general[k][p].obj_id == Empty){
-            k++ ;
-            p-- ;
+        int k = pos_x -1 ;
+        int p = pos_y +1 ;
+        while(k >= 0 && p < BOARD_SIZE && tab_general[k][p].obj_id == Empty){
+            k-- ;
+            p++ ;
         }
-        if(k == BOARD_SIZE || p < 0)
+        if(k < 0 || p == BOARD_SIZE)
             return ;
         tab_general[k][p].obj_id = Empty ;
         return ;
@@ -485,13 +481,13 @@ void erase_the_clue_object(struct Box ** tab_general, struct Perso * tab, struct
         return ;
     }
     if(a_clue->position_id == South_West){
-        int k = pos_x -1 ;
-        int p = pos_y +1 ;
-        while(k >= 0 && p < BOARD_SIZE && tab_general[k][p].obj_id == Empty){
-            k-- ;
-            p++ ;
+        int k = pos_x +1 ;
+        int p = pos_y -1 ;
+        while(k < BOARD_SIZE && p >= 0 && tab_general[k][p].obj_id == Empty){
+            k++ ;
+            p-- ;
         }
-        if(k < 0 || p == BOARD_SIZE)
+        if(k == BOARD_SIZE || p < 0)
             return ;
         tab_general[k][p].obj_id = Empty ;
         return ;
@@ -577,4 +573,3 @@ struct Box ** copy_board(struct Box ** board){
     }
     return copy ;
 }
-
